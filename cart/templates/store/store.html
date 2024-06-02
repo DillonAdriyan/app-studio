@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+ <div class="row">
+  {% if products %}
+   {% for product in products %}
+  <div class="col">
+   <div class="card">
+    <img src="{{ product.image.url }}"
+    class="card-img-top" alt="{{ product.name }}"
+    height="auto" width="80"/>
+   <div class="card-body">
+    <h5 class="card-title">{{ product.name }}</h5>
+    <p class="card-text">
+     {{ product.description }}
+    </p>
+    <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="product" value="{{ product.id }}">
+            <button class="btn btn-primary" type="submit">Add to Cart</button>
+        </form>
+   </div>
+  </div>
+ </div>
+  {% endfor %}
+ {% else %}
+<p>Tidak ada data di database</p>
+ {% endif %}
+
+</div>
+</div>
+{% endblock %}
