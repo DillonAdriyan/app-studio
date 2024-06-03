@@ -14,11 +14,9 @@
     <p class="card-text">
      {{ product.description }}
     </p>
-    <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="product" value="{{ product.id }}">
+          <a href="{% url 'addCart' product.id %}">
             <button class="btn btn-primary" type="submit">Add to Cart</button>
-        </form>
+          </a>
    </div>
   </div>
  </div>
