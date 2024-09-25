@@ -14,8 +14,14 @@ import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = Path(__file__).resolve().parent.parent
+# 
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# settings.py
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -26,19 +32,33 @@ SECRET_KEY = 'django-insecure-od0o9vo-x-5h=bdycr8=umh4gh$unu#l$%niu*uvlj8+z+_^32
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.5','127.0.0.1']
 
-
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '59756919568-ucd20kghtmrh6rgnafmv06iufq417gpr.apps.googleusercontent.com',
+            'secret': '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',
+            'key': ''
+        }
+    }
+}
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
+    'store',
     'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cart',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +69,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'studio.urls'
@@ -72,7 +93,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'studio.wsgi.application'
 
-
+SITE_ID = 1
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 

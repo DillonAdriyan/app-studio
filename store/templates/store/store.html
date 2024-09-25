@@ -1,0 +1,42 @@
+<!-- store.html -->
+{% extends 'base.html' %}
+
+{% block title %}Store{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Our Products</h1>
+{% for product in products %}
+<div class="col-md-4 mb-4">
+    <div class="card">
+        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+        <div class="card-body">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text">${{ product.price }}</p>
+            <p>Average Rating: 
+                {% if product.average_rating %}
+                    {{ product.average_rating|floatformat:1 }} / 5
+                {% else %}
+                    No ratings yet
+                {% endif %}
+            </p>
+            <form method="post" action="{% url 'rate_product' product.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="rating">Rate this product:</label>
+                    <select name="score" id="rating" class="form-control">
+                        <option value="">Select Rating</option>
+                        {% for i in "12345"|make_list %}
+                            <option value="{{ i }}">{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Rating</button>
+            </form>
+            <a href="{% url 'addCart' product.id %}" class="btn btn-primary">Add to Cart</a>
+        </div>
+    </div>
+</div>
+{% empty %}
+<p>No product is here</p>
+{% endfor %}
+{% endblock %}

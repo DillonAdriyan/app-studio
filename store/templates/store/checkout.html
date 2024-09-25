@@ -1,0 +1,41 @@
+<!-- checkout.html -->
+{% extends 'base.html' %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Checkout</h1>
+{% if cart and cart.items.exists %}
+    <form method="post">
+        {% csrf_token %}
+        <h2>Order Summary</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart.items.all %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ item.get_total_price}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2"><strong>Total</strong></td>
+                    <td><strong>${{ cart.get_total_price }}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+        <button type="submit" class="btn btn-success">Place Order</button>
+    </form>
+{% else %}
+    <p>Your cart is empty. You cannot proceed to checkout.</p>
+{% endif %}
+{% endblock %}

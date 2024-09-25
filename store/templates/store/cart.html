@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Your Cart</h1>
+{% if cart and cart.items.exists %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart.items.all %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>${{ item.product.price }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>${{ item.total_price }}</td>
+                    <td>
+                        <a href="{% url 'add_quantity' item.id %}" class="btn btn-sm btn-primary">+</a>
+                        <a href="{% url 'remove_quantity' item.id %}" class="btn btn-sm btn-danger">-</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3"><strong>Total</strong></td>
+                <td colspan="2"><strong>${{ cart.get_total_price }}</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <!-- Wrap the checkout button in a POST form -->
+    <form action="{% url 'checkout' %}" method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Proceed to Checkout</button>
+    </form>
+{% else %}
+    <p>Your cart is empty.</p>
+{% endif %}
+{% endblock %}

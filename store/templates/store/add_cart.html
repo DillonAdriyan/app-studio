@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <img src="{{ products.image.url }}" class="card-img-top" alt="{{ products.name }}" height="auto" width="80"/>
+                <div class="card-body">
+                    <h5 class="card-title">{{ products.name }}</h5>
+                    <p class="card-text">
+                        {{ products.description }}
+                    </p>
+                    <form method="POST" action="{% url 'addCart' products.id %}">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <button class="btn btn-outline-secondary" type="button" id="decrease">-</button>
+                            </div>
+                            <input type="number" class="form-control" id="quantity" value="1" min="1" style="margin-left: 4px; margin-right: 4px;" name="quantity">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="increase">+</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" type="submit">Add to Cart</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('decrease').addEventListener('click', function() {
+        var quantityInput = document.getElementById('quantity');
+        var currentValue = parseInt(quantityInput.value);
+        if (currentValue > 1) {
+            quantityInput.value = currentValue - 1;
+        }
+    });
+
+    document.getElementById('increase').addEventListener('click', function() {
+        var quantityInput = document.getElementById('quantity');
+        quantityInput.value = parseInt(quantityInput.value) + 1;
+    });
+</script>
+{% endblock %}

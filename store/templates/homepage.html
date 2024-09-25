@@ -1,0 +1,25 @@
+<!-- homepage.html -->
+{% extends 'base.html' %}
+
+{% block title %}Welcome to My Store{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Welcome to My Store</h1>
+<div class="row">
+    {% for product in products %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">${{ product.price }}</p>
+                    <a href="{% url 'addCart' product.id %}" class="btn btn-primary">Add to Cart</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<div class="text-center mt-4">
+    <a href="{% url 'store' %}" class="btn btn-lg btn-primary">View All Products</a>
+</div>
+{% endblock %}
