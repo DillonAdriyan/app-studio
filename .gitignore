@@ -5,3 +5,4 @@
 /media/**/*
 /products/*
 /db.sqlite3
+/.env
