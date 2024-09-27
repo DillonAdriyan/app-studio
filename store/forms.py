@@ -28,4 +28,3 @@ class RatingForm(forms.ModelForm):
     class Meta:
         model = Rating
         fields = ['score']  # Only allow the score field to be rated
-        

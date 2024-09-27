@@ -31,6 +31,9 @@
                         </tr>
                     </tfoot>
                 </table>
+                
+                <!-- Tambahkan tombol download invoice -->
+                <a href="{% url 'download_invoice' order.id %}" class="btn btn-primary mt-3">Download Invoice</a>
             </div>
         </div>
     {% endfor %}

@@ -1,9 +1,6 @@
 /studio/__pycache__/*
-/studio/__init__.py*
 /studio/settings.py
 /store/__pycache__/*
-/store/migrations/__init__.py*
-/store/__init__.py*
 /store/migrations/*
 /media/**/*
 /products/*

@@ -100,6 +100,7 @@ class Product(models.Model):
             self.image.name = unique_filename
             
         super().save(*args, **kwargs)
+
 class Order(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
@@ -114,6 +115,7 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    invoice = models.CharField(max_length=255, blank=True, null=True)  # Field baru untuk menyimpan invoice path
 
     def __str__(self):
         return f"Order {self.id} by {self.customer.username}"

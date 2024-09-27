@@ -9,6 +9,22 @@ from .models import Product, Category, Order, OrderItem, Cart, CartItem, Wishlis
 from django.db.models import Avg
 from django.db.models import F
 from django.contrib.auth.mixins import LoginRequiredMixin
+from weasyprint import HTML
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
+import os
+from django.conf import settings
+from django.http import FileResponse
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.lib.styles import getSampleStyleSheet
+from decimal import Decimal
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
+from django.template.loader import render_to_string
+
+
 def homepage(request):
     products = Product.objects.filter(is_active=True).annotate(
         average_rating=Avg('ratings__score')  # Calculate average rating
@@ -84,6 +100,154 @@ def logout(request):
 
 
 
+
+
+
+def generate_invoice(order):
+    # Buat path untuk menyimpan invoice
+    invoice_dir = os.path.join(settings.MEDIA_ROOT, 'invoices')
+    
+    # Cek apakah folder 'invoices' sudah ada, jika belum, buat folder tersebut
+    if not os.path.exists(invoice_dir):
+        os.makedirs(invoice_dir)
+
+    # Buat nama file invoice berdasarkan nomor pesanan
+    invoice_filename = f'invoice_{order.id}.pdf'
+    invoice_filepath = os.path.join(invoice_dir, invoice_filename)
+
+    # Ambil data pesanan yang diperlukan untuk invoice
+    items = order.items.all()
+    total_price = sum(item.get_total_price() for item in items)
+    tax_rate = Decimal('0.10')
+    disc_rate = Decimal('0.05')
+    tax = total_price * tax_rate
+    discount = disc_rate * total_price  # Contoh diskon 5%
+    grand_total = total_price + tax - discount
+
+    # Render template HTML ke string
+    html_string = render_to_string('store/invoice_template.html', {
+        'order': order,
+        'items': items,
+        'total_price': total_price,
+        'tax': tax,
+        'discount': discount,
+        'grand_total': grand_total,
+        'company': {
+            'name': 'Sempurna, Inc.',
+            'address': '270 5th Avenue, New Road, Jakarta City',
+            'phone': '+62 123 4567'
+        }
+    })
+
+    # Konversi HTML menjadi PDF menggunakan WeasyPrint
+    HTML(string=html_string).write_pdf(invoice_filepath)
+
+    # Return path relative ke MEDIA_URL untuk diakses di template
+    return os.path.join('invoices', invoice_filename)
+    
+ 
+
+
+def generate_invoice2(order):
+    # Buat path untuk menyimpan invoice
+    invoice_dir = os.path.join(settings.MEDIA_ROOT, 'invoices')
+    
+    # Cek apakah folder 'invoices' sudah ada, jika belum, buat folder tersebut
+    if not os.path.exists(invoice_dir):
+        os.makedirs(invoice_dir)
+    
+    # Buat nama file invoice berdasarkan nomor pesanan
+    invoice_filename = f'invoice_{order.id}.pdf'
+    invoice_filepath = os.path.join(invoice_dir, invoice_filename)
+
+    # Buat PDF
+    pdf = SimpleDocTemplate(invoice_filepath, pagesize=A4)
+    width, height = A4
+    elements = []
+    
+    # Stylesheet untuk paragraph
+    styles = getSampleStyleSheet()
+    centered = styles["Title"]
+    centered.alignment = TA_CENTER
+    normal_left = styles["Normal"]
+    normal_left.alignment = TA_LEFT
+    bold_style = styles["Heading2"]
+    bold_style.alignment = TA_LEFT
+
+    # Header Perusahaan
+    elements.append(Paragraph("SEMPURNA, INC.", bold_style))
+    elements.append(Paragraph("Design Studio", normal_left))
+    elements.append(Paragraph("Sempurna Inc, 10 January 2018", normal_left))
+    elements.append(Spacer(1, 12))
+    
+    # Detail Invoice dan Customer
+    elements.append(Paragraph(f"Invoice Number: {order.id}", normal_left))
+    elements.append(Paragraph(f"Date: {order.created_at.strftime('%Y-%m-%d')}", normal_left))
+    elements.append(Spacer(1, 12))
+
+    # Tabel Pesanan
+    data = [["NO", "ITEM DESCRIPTION", "PRICE", "QTY", "TOTAL"]]
+
+    total_price = Decimal(0)  # Menggunakan Decimal
+    for idx, item in enumerate(order.items.all(), start=1):
+        total_item_price = item.get_total_price()
+        data.append([str(idx), item.product.name, f"${item.price:.2f}", str(item.quantity), f"${total_item_price:.2f}"])
+        total_price += total_item_price
+
+    # Menggunakan Decimal untuk perhitungan pajak dan total
+    tax_rate = Decimal('0.15')  # Pajak 15%
+    tax_amount = total_price * tax_rate
+    grand_total = total_price + tax_amount
+
+    # Tambahkan total ke dalam tabel
+    data.append(["", "", "", "Sub Total:", f"${total_price:.2f}"])
+    data.append(["", "", "", "Tax (15%):", f"${tax_amount:.2f}"])
+    data.append(["", "", "", "Grand Total:", f"${grand_total:.2f}"])
+
+    # Gaya untuk tabel
+    table = Table(data, colWidths=[0.5 * inch, 2 * inch, 1.5 * inch, 1 * inch, 1.5 * inch])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.red),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ]))
+
+    elements.append(table)
+
+    # Spacer untuk memberi jarak sebelum menambahkan detail akhir
+    elements.append(Spacer(1, 24))
+
+    # Footer: Terms & Conditions dan Payment Method
+    elements.append(Paragraph("Payment Method:", bold_style))
+    elements.append(Paragraph("Bank Account: 123456789", normal_left))
+    elements.append(Paragraph("Bank Code: 001", normal_left))
+    elements.append(Spacer(1, 12))
+
+    elements.append(Paragraph("Terms & Conditions:", bold_style))
+    elements.append(Paragraph("Lorem ipsum dolor sit amet, consectetur adipiscing elit.", normal_left))
+
+    # Tanda tangan
+    elements.append(Spacer(1, 48))
+    elements.append(Paragraph("____________________", normal_left))
+    elements.append(Paragraph("Steven Joe", normal_left))
+    elements.append(Paragraph("Accounting Manager", normal_left))
+
+    # Simpan PDF
+    pdf.build(elements)
+
+    # Return path relative ke MEDIA_URL untuk diakses di template
+    return os.path.join('invoices', invoice_filename)
+
+
+
+
+
+
+
 @method_decorator(login_required, name='dispatch')
 class CheckOut(View):
     def post(self, request):
@@ -99,10 +263,10 @@ class CheckOut(View):
                 messages.error(request, f"Not enough stock for {cart_item.product.name}.")
                 return redirect('cart')
 
-        # Create the order
+        # Buat pesanan
         order = Order.objects.create(customer=user)
 
-        # Create order items from cart items
+        # Buat item pesanan dari item keranjang
         for cart_item in cart.items.all():
             OrderItem.objects.create(
                 order=order,
@@ -111,20 +275,41 @@ class CheckOut(View):
                 price=cart_item.product.price
             )
 
-            # Reduce stock
+            # Kurangi stok
             cart_item.product.stock -= cart_item.quantity
             cart_item.product.save()
 
-        # Update the total price for the order
+        # Perbarui total harga untuk pesanan
         order.update_total_price()
 
-        # Clear the cart
+        # Generate invoice
+        invoice_filename = generate_invoice(order)
+
+        # Tambahkan invoice ke dalam model Order (opsional, jika mau disimpan di DB)
+        order.invoice = invoice_filename
+        order.save()
+
+        # Kosongkan keranjang
         cart.items.all().delete()
 
         messages.success(request, "Your order has been placed successfully.")
         return redirect('orders')
 
 
+
+
+def download_invoice(request, order_id):
+    order = get_object_or_404(Order, id=order_id, customer=request.user)
+    invoice_filepath = os.path.join(settings.MEDIA_ROOT, order.invoice)
+
+    # Pastikan file invoice ada
+    if not os.path.exists(invoice_filepath):
+        messages.error(request, "Invoice not found.")
+        return redirect('orders')
+
+    # Kembalikan file PDF sebagai respons
+    return FileResponse(open(invoice_filepath, 'rb'), content_type='application/pdf')
+    
 
 
 
