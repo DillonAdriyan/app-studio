@@ -1,0 +1,9 @@
+django
+djangorestframework
+requests
+django-allauth
+django-jazzmin
+jwt
+pillow
+reportlab
+weasyprint
