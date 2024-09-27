@@ -4,3 +4,4 @@
 /store/migrations/*
 /media/**/*
 /products/*
+/db.sqlite3
