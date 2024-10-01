@@ -19,9 +19,9 @@
             {% for item in cart.items.all %}
                 <tr>
                     <td>{{ item.product.name }}</td>
-                    <td>${{ item.product.price }}</td>
+                    <td>Rp. {{ item.product.price }}</td>
                     <td>{{ item.quantity }}</td>
-                    <td>${{ item.total_price }}</td>
+                    <td>Rp. {{ item.get_total_price }}</td>
                     <td>
                         <a href="{% url 'add_quantity' item.id %}" class="btn btn-sm btn-primary">+</a>
                         <a href="{% url 'remove_quantity' item.id %}" class="btn btn-sm btn-danger">-</a>
@@ -32,7 +32,7 @@
         <tfoot>
             <tr>
                 <td colspan="3"><strong>Total</strong></td>
-                <td colspan="2"><strong>${{ cart.get_total_price }}</strong></td>
+                <td colspan="2"><strong>Rp. {{ cart.get_total_price }}</strong></td>
             </tr>
         </tfoot>
     </table>

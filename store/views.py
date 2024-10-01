@@ -23,8 +23,51 @@ from decimal import Decimal
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 from django.template.loader import render_to_string
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser
+from rest_framework import status
+import requests
+from rest_framework.permissions import IsAuthenticated
+from django.db import transaction
 
+class FacebookProfileView(APIView):
+    def get(self, request, *args, **kwargs):
+        access_token = settings.INSTAGRAM_ACCESS_TOKEN  # Your Facebook token with public_profile scope
 
+        url = "https://graph.facebook.com/me"
+        params = {
+            'fields': 'id,name,picture',  # Requesting basic fields
+            'access_token': access_token
+        }
+        response = requests.get(url, params=params)
+
+        if response.status_code == 200:
+            data = response.json()
+            return Response(data)
+        else:
+            return Response({'error': 'Failed to retrieve data', 'details': response.json()}, status=response.status_code)
+            
+class InstagramDataView(APIView):
+    permission_classes = [IsAuthenticated]  # Sesuaikan izin jika perlu
+  
+    def get(self, request, *args, **kwargs):
+        access_token = settings.INSTAGRAM_ACCESS_TOKEN
+
+        url = "https://graph.instagram.com/me"
+        params = {
+            'fields': 'id,username,followers_count,follows_count',
+            'access_token': access_token
+        }
+        response = requests.get(url, params=params)
+        print(response.status_code)
+        print(response.text)  # Menampilkan respons dari API Instagram
+        if response.status_code == 200:
+            data = response.json()
+            return Response(data)
+        else:
+            return Response({'error': 'Failed to retrieve data'}, status=400)
+            
 def homepage(request):
     products = Product.objects.filter(is_active=True).annotate(
         average_rating=Avg('ratings__score')  # Calculate average rating
@@ -139,11 +182,21 @@ def generate_invoice(order):
         }
     })
 
+    # Debug: Cek apakah HTML string sudah ter-render dengan benar
+    # Tambahkan ini untuk memeriksa apakah ada kesalahan dalam rendering
+    print(html_string)  # Ini akan mencetak HTML ke konsol, bisa dihapus setelah debugging
+
     # Konversi HTML menjadi PDF menggunakan WeasyPrint
-    HTML(string=html_string).write_pdf(invoice_filepath)
+    try:
+        HTML(string=html_string).write_pdf(invoice_filepath)
+    except Exception as e:
+        print(f"Error generating PDF: {e}")  # Debugging error jika konversi gagal
+        return None
 
     # Return path relative ke MEDIA_URL untuk diakses di template
     return os.path.join('invoices', invoice_filename)
+
+
     
  
 
@@ -252,48 +305,72 @@ def generate_invoice2(order):
 class CheckOut(View):
     def post(self, request):
         user = request.user
-        cart = Cart.objects.filter(customer=user).first()
+
+        # Prefetch items dan select product dalam satu query
+        cart = Cart.objects.prefetch_related('items__product').filter(customer=user).first()
 
         if not cart or not cart.items.exists():
             messages.error(request, "Your cart is empty.")
             return redirect('cart')
 
-        for cart_item in cart.items.all():
-            if cart_item.quantity > cart_item.product.stock:
-                messages.error(request, f"Not enough stock for {cart_item.product.name}.")
-                return redirect('cart')
+        # Periksa stok sekaligus tanpa looping
+        out_of_stock_items = [
+            cart_item for cart_item in cart.items.all()
+            if cart_item.quantity > cart_item.product.stock
+        ]
+        if out_of_stock_items:
+            messages.error(request, f"Not enough stock for {out_of_stock_items[0].product.name}.")
+            return redirect('cart')
 
-        # Buat pesanan
-        order = Order.objects.create(customer=user)
+        try:
+            # Gunakan transaksi agar jika terjadi kesalahan, semua perubahan di-rollback
+            with transaction.atomic():
+                # Buat pesanan
+                order = Order.objects.create(customer=user)
 
-        # Buat item pesanan dari item keranjang
-        for cart_item in cart.items.all():
-            OrderItem.objects.create(
-                order=order,
-                product=cart_item.product,
-                quantity=cart_item.quantity,
-                price=cart_item.product.price
-            )
+                # Buat item pesanan dari item keranjang
+                order_items = []
+                for cart_item in cart.items.all():
+                    order_items.append(OrderItem(
+                        order=order,
+                        product=cart_item.product,
+                        quantity=cart_item.quantity,
+                        price=cart_item.product.price
+                    ))
 
-            # Kurangi stok
-            cart_item.product.stock -= cart_item.quantity
-            cart_item.product.save()
+                    # Kurangi stok tanpa save per item
+                    cart_item.product.stock = F('stock') - cart_item.quantity
 
-        # Perbarui total harga untuk pesanan
-        order.update_total_price()
+                # Simpan semua OrderItem sekaligus
+                OrderItem.objects.bulk_create(order_items)
 
-        # Generate invoice
-        invoice_filename = generate_invoice(order)
+                # Simpan produk yang stoknya telah diperbarui
+                Product.objects.bulk_update(
+                    [cart_item.product for cart_item in cart.items.all()], ['stock']
+                )
 
-        # Tambahkan invoice ke dalam model Order (opsional, jika mau disimpan di DB)
-        order.invoice = invoice_filename
-        order.save()
+                # Perbarui total harga untuk pesanan
+                order.update_total_price()
 
-        # Kosongkan keranjang
-        cart.items.all().delete()
+                # Generate invoice
+                invoice_filename = generate_invoice(order)
 
-        messages.success(request, "Your order has been placed successfully.")
+                # Tambahkan invoice ke dalam model Order
+                order.invoice = invoice_filename
+                order.save()
+
+                # Kosongkan keranjang dalam satu query
+                cart.items.all().delete()
+
+            messages.success(request, "Your order has been placed successfully.")
+        except Exception as e:
+            print(e)
+            messages.error(request, "There was an error processing your order.")
+            return redirect('cart')
+
         return redirect('orders')
+
+
 
 
 

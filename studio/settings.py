@@ -12,6 +12,13 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 import sys
 from pathlib import Path
+from decouple import config
+
+INSTAGRAM_ACCESS_TOKEN = config('INSTAGRAM_ACCESS_TOKEN')
+FACEBOOK_KEY = config('FACEBOOK_KEY')
+ID_CLIENT_FACEBOOK = config('ID_CLIENT_FACEBOOK')
+SOCIAL_AUTH_FACEBOOK_KEY = ID_CLIENT_FACEBOOK
+SOCIAL_AUTH_FACEBOOK_SECRET = FACEBOOK_KEY
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -34,15 +41,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['192.168.1.5','127.0.0.1']
 
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': '59756919568-ucd20kghtmrh6rgnafmv06iufq417gpr.apps.googleusercontent.com',
-            'secret': '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',
-            'key': ''
-        }
-    }
-}
 # Application definition
 
 INSTALLED_APPS = [
@@ -59,6 +57,11 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
+    'rest_framework',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
@@ -92,12 +95,51 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'studio.wsgi.application'
-
 SITE_ID = 1
-AUTHENTICATION_BACKENDS = [
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
+
+AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
-]
+)
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '59756919568-ucd20kghtmrh6rgnafmv06iufq417gpr.apps.googleusercontent.com',
+            'secret': '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',
+            'key': ''
+        }
+    },
+    'facebook': {
+        'METHOD': 'oauth2',
+        'SCOPE': ['email'],
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        'INIT_PARAMS': {'cookie': True},
+        'FIELDS': [
+            'id',
+            'email',
+            'name',
+            'first_name',
+            'last_name',
+            'verified',
+            'locale',
+            'timezone',
+            'link',
+            'gender',
+        ],
+        'EXCHANGE_TOKEN': True,
+        'LOCALE_FUNC': lambda request: 'en_US',
+        'VERIFIED_EMAIL': False,
+        'VERSION': 'v12.0',
+        },
+}
+
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
