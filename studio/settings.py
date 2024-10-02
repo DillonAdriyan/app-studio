@@ -46,6 +46,7 @@ ALLOWED_HOSTS = ['192.168.1.5','127.0.0.1']
 INSTALLED_APPS = [
     'jazzmin',
     'store',
+    'api',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.sites',
@@ -61,7 +62,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'dj_rest_auth',
     'dj_rest_auth.registration',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -73,6 +75,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'studio.urls'
@@ -92,6 +95,12 @@ TEMPLATES = [
             ],
         },
     },
+]
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_ORIGINS = [
+    'https://dillonadriyan.github.io',
+    'http://localhost:8158'
 ]
 
 WSGI_APPLICATION = 'studio.wsgi.application'
