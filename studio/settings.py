@@ -17,6 +17,9 @@ from decouple import config
 INSTAGRAM_ACCESS_TOKEN = config('INSTAGRAM_ACCESS_TOKEN')
 FACEBOOK_KEY = config('FACEBOOK_KEY')
 ID_CLIENT_FACEBOOK = config('ID_CLIENT_FACEBOOK')
+
+GOOGLE_SECRET = config('GOOGLE_API_SECRET')
+GOOGLE_ID = config('GOOGLE_CLIENT_ID')
 SOCIAL_AUTH_FACEBOOK_KEY = ID_CLIENT_FACEBOOK
 SOCIAL_AUTH_FACEBOOK_SECRET = FACEBOOK_KEY
 
@@ -39,8 +42,40 @@ SECRET_KEY = 'django-insecure-od0o9vo-x-5h=bdycr8=umh4gh$unu#l$%niu*uvlj8+z+_^32
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.5','127.0.0.1']
-
+ALLOWED_HOSTS = ['dillonadriyan.pythonanywhere.com', '.ngrok-free.app', 'localhost', ]
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+        'APP': {
+            'client_id': GOOGLE_ID,
+            'secret': GOOGLE_SECRET,
+            'key': ''
+        }
+    },
+    'facebook': {
+        'METHOD': 'oauth2',
+        'SCOPE': ['email'],
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        'INIT_PARAMS': {'cookie': True},
+        'FIELDS': [
+            'id',
+            'email',
+            'name',
+            'first_name',
+            'last_name',
+            'verified',
+            'locale',
+            'timezone',
+            'link',
+            'gender',
+        ],
+        'EXCHANGE_TOKEN': True,
+        'LOCALE_FUNC': lambda request: 'en_US',
+        'VERIFIED_EMAIL': False,
+        'VERSION': 'v12.0',
+        },
+}
 # Application definition
 
 INSTALLED_APPS = [
@@ -96,16 +131,15 @@ TEMPLATES = [
         },
     },
 ]
-CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
     'https://dillonadriyan.github.io',
-    'http://localhost:8158'
+    'https://dillonadriyan.me',
+    #'http://localhost:8158'
 ]
 
 WSGI_APPLICATION = 'studio.wsgi.application'
 SITE_ID = 1
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
@@ -117,37 +151,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': '59756919568-ucd20kghtmrh6rgnafmv06iufq417gpr.apps.googleusercontent.com',
-            'secret': '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',
-            'key': ''
-        }
-    },
-    'facebook': {
-        'METHOD': 'oauth2',
-        'SCOPE': ['email'],
-        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
-        'INIT_PARAMS': {'cookie': True},
-        'FIELDS': [
-            'id',
-            'email',
-            'name',
-            'first_name',
-            'last_name',
-            'verified',
-            'locale',
-            'timezone',
-            'link',
-            'gender',
-        ],
-        'EXCHANGE_TOKEN': True,
-        'LOCALE_FUNC': lambda request: 'en_US',
-        'VERIFIED_EMAIL': False,
-        'VERSION': 'v12.0',
-        },
-}
+
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
