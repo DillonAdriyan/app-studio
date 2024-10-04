@@ -6,3 +6,4 @@
 /products/*
 /db.sqlite3
 /.env
+/db.sqlite3

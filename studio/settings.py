@@ -42,16 +42,19 @@ SECRET_KEY = 'django-insecure-od0o9vo-x-5h=bdycr8=umh4gh$unu#l$%niu*uvlj8+z+_^32
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['dillonadriyan.pythonanywhere.com', '.ngrok-free.app', 'localhost', ]
+ALLOWED_HOSTS =['dillonadriyan.pythonanywhere.com',
+'.ngrok-free.app', 'localhost', '127.0.0.1']
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {'access_type': 'online'},
-        'APP': {
-            'client_id': GOOGLE_ID,
+        'APP': 
+         {
+            'client_id':
+            '38673942993-0ihbnrsj16i7s478fdjprnlcog0orltk.apps.googleusercontent.com',
             'secret': GOOGLE_SECRET,
             'key': ''
-        }
+         },
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
     },
     'facebook': {
         'METHOD': 'oauth2',
@@ -152,7 +155,7 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-
+LOGIN_REDIRECT_URL = 'homepage' 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
