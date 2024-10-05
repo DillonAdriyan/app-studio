@@ -5,6 +5,9 @@ requests
 django-allauth
 django-jazzmin
 jwt
+pyJWT=2.5.0
+py
 pillow
 reportlab
 weasyprint
+python-decouple
