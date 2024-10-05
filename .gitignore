@@ -1,9 +1,10 @@
 /studio/__pycache__/*
-/studio/settings.py
+/api/__pycache__/*
 /store/__pycache__/*
 /store/migrations/*
+/store/migrations/__pycache__/*
+/api/migrations/__pycache__/*
 /media/**/*
 /products/*
-/db.sqlite3
 /.env
 /db.sqlite3
