@@ -1,71 +1,69 @@
 <!-- base.html -->
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}My Store{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     {% block extra_css %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'homepage' %}">My Store</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+<body class="bg-gray-100 text-gray-900">
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="{% url 'homepage' %}" class="text-xl font-bold text-gray-800 hover:text-gray-600">
+                My Store
+            </a>
+            <button class="block lg:hidden text-gray-800" id="menuToggle">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'store' %}">Store</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
+            <div class="hidden lg:flex space-x-6 items-center" id="navbarMenu">
+                <a href="{% url 'store' %}" class="text-gray-800 hover:text-gray-600">Store</a>
+                <div class="space-x-6">
                     {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'cart' %}">Cart</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'orders' %}">Orders</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                        </li>
+                        <a href="{% url 'cart' %}" class="text-gray-800 hover:text-gray-600">Cart</a>
+                        <a href="{% url 'orders' %}" class="text-gray-800 hover:text-gray-600">Orders</a>
+                        <a href="{% url 'logout' %}" class="text-red-600 hover:text-red-400">Logout</a>
                     {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
-                        </li>
+                        <a href="{% url 'login' %}" class="text-gray-800 hover:text-gray-600">Login</a>
+                        <a href="{% url 'signup' %}" class="text-gray-800 hover:text-gray-600">Sign Up</a>
                     {% endif %}
-                </ul>
+                </div>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container mx-auto mt-6 px-4">
         {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
+            <div class="space-y-4">
+                {% for message in messages %}
+                    <div class="bg-{{ message.tags }}-100 border-l-4 border-{{ message.tags }}-500 text-{{ message.tags }}-700 p-4" role="alert">
+                        <p>{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
         {% endif %}
 
         {% block content %}{% endblock %}
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <footer class="bg-white py-6 mt-12 shadow-inner">
+        <div class="container mx-auto text-center text-gray-600">
+            &copy; 2024 My Store. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const navbarMenu = document.getElementById('navbarMenu');
+        
+        menuToggle.addEventListener('click', () => {
+            navbarMenu.classList.toggle('hidden');
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
-
-
-
-
-
-
-

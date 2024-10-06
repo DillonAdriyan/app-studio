@@ -1,48 +1,59 @@
+<!-- cart.html -->
 {% extends 'base.html' %}
 
 {% block title %}Your Cart{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Your Cart</h1>
+<h1 class="text-2xl font-bold mb-6">Your Cart</h1>
 {% if cart and cart.items.exists %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Total</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in cart.items.all %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+            <thead class="bg-gray-100 text-gray-600 text-sm">
                 <tr>
-                    <td>{{ item.product.name }}</td>
-                    <td>Rp. {{ item.product.price }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>Rp. {{ item.get_total_price }}</td>
-                    <td>
-                        <a href="{% url 'add_quantity' item.id %}" class="btn btn-sm btn-primary">+</a>
-                        <a href="{% url 'remove_quantity' item.id %}" class="btn btn-sm btn-danger">-</a>
-                    </td>
+                    <th class="p-4 text-left">Product</th>
+                    <th class="p-4 text-left">Price</th>
+                    <th class="p-4 text-left">Quantity</th>
+                    <th class="p-4 text-left">Total</th>
+                    <th class="p-4 text-left">Actions</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="3"><strong>Total</strong></td>
-                <td colspan="2"><strong>Rp. {{ cart.get_total_price }}</strong></td>
-            </tr>
-        </tfoot>
-    </table>
+            </thead>
+            <tbody class="text-gray-700">
+                {% for item in cart.items.all %}
+                    <tr class="border-b">
+                        <td class="p-4">{{ item.product.name }}</td>
+                        <td class="p-4">Rp. {{ item.product.price }}</td>
+                        <td class="p-4">{{ item.quantity }}</td>
+                        <td class="p-4">Rp. {{ item.get_total_price }}</td>
+                        <td class="p-4 flex space-x-2">
+                            <a href="{% url 'add_quantity' item.id %}" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                                +
+                            </a>
+                            <a href="{% url 'remove_quantity' item.id %}" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                                -
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="bg-gray-100">
+                <tr>
+                    <td colspan="3" class="p-4 text-right font-bold text-gray-700">Total</td>
+                    <td colspan="2" class="p-4 text-left font-bold text-gray-700">Rp. {{ cart.get_total_price }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 
-    <!-- Wrap the checkout button in a POST form -->
-    <form action="{% url 'checkout' %}" method="POST">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-success">Proceed to Checkout</button>
-    </form>
+    <!-- Checkout button -->
+    <div class="mt-6">
+        <form action="{% url 'checkout' %}" method="POST" class="text-right">
+            {% csrf_token %}
+            <button type="submit" class="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600">
+                Proceed to Checkout
+            </button>
+        </form>
+    </div>
 {% else %}
-    <p>Your cart is empty.</p>
+    <p class="text-gray-600">Your cart is empty.</p>
 {% endif %}
 {% endblock %}

@@ -1,0 +1,23 @@
+{
+  "name": "app-studio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DillonAdriyan/app-studio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DillonAdriyan/app-studio/issues"
+  },
+  "homepage": "https://github.com/DillonAdriyan/app-studio#readme",
+  "dependencies": {
+    "tailwindcss": "^3.4.13"
+  }
+}

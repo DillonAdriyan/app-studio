@@ -23,33 +23,45 @@ from PIL import Image
 from django.core.files.base import ContentFile
 from io import BytesIO
 
+
 def compress_image(image, max_size_kb=500):
     # Open the image file
     img = Image.open(image)
     
     # Initial size
     img_format = img.format
-
-    # Define the quality for compression
-    quality = 90  # Initial quality
     
-    # Loop to reduce quality until the image size is below max_size_kb
-    while True:
+    # Start with a high and low range for quality
+    low, high = 10, 90
+    best_quality = high
+    img_io = None
+
+    # Use binary search to find the best quality
+    while low <= high:
+        mid_quality = (low + high) // 2
+
         # Create a BytesIO object to save the compressed image
         img_io = BytesIO()
-        img.save(img_io, format=img_format, quality=quality)
+        img.save(img_io, format=img_format, quality=mid_quality)
         img_io.seek(0)
         
         # Check the size of the image
-        if img_io.getbuffer().nbytes <= max_size_kb * 1024:
-            break
-        quality -= 5  # Decrease quality to compress more
-        
-        if quality < 10:  # Prevent quality going too low
-            break
+        size_kb = img_io.getbuffer().nbytes / 1024
+
+        if size_kb <= max_size_kb:
+            best_quality = mid_quality
+            high = mid_quality - 1  # Try a lower quality
+        else:
+            low = mid_quality + 1  # Increase quality to reduce size
+
+    # Save the final image with the best found quality
+    img_io = BytesIO()
+    img.save(img_io, format=img_format, quality=best_quality)
+    img_io.seek(0)
     
     # Return the compressed image
     return ContentFile(img_io.getvalue(), name=image.name)
+
 
 
 class Profile(models.Model):

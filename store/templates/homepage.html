@@ -1,25 +1,112 @@
-<!-- homepage.html -->
 {% extends 'base.html' %}
 
-{% block title %}Welcome to My Store{% endblock %}
+{% block title %}Store{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Welcome to My Store</h1>
-<div class="row">
-    {% for product in products %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
-                <div class="card-body">
-                    <h5 class="card-title">{{ product.name }}</h5>
-                    <p class="card-text">${{ product.price }}</p>
-                    <a href="{% url 'addCart' product.id %}" class="btn btn-primary">Add to Cart</a>
+<div class="flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div class="container flex h-16 items-center">
+            <a href="/" class="mr-6 flex items-center space-x-2">
+                <svg class="h-6 w-6"> <!-- ShoppingCart icon --> </svg>
+                <span class="hidden font-bold sm:inline-block">ModernShop</span>
+            </a>
+            <nav class="flex items-center space-x-6 text-sm font-medium flex-1">
+                <a href="/products">All Products</a>
+                <a href="/categories">Categories</a>
+                <a href="/deals">Deals</a>
+                <a href="/about">About</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <svg class="h-6 w-6"> <!-- Search icon --> </svg>
+                <svg class="h-6 w-6"> <!-- Heart icon --> </svg>
+                <svg class="h-6 w-6"> <!-- User icon --> </svg>
+                <svg class="h-6 w-6"> <!-- ShoppingCart icon --> </svg>
+            </div>
+            <button class="ml-4 md:hidden">
+                <svg class="h-6 w-6"> <!-- Menu icon --> </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1">
+        <!-- Hero Section -->
+        <section class="w-full py-12 md:py-24 lg:py-32 xl:py-48">
+            <div class="container px-4 md:px-6">
+                <div class="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
+                    <div class="flex flex-col justify-center space-y-4">
+                        <div class="space-y-2">
+                            <h1 class="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl">
+                                Discover Your Style
+                            </h1>
+                            <p class="max-w-[600px] text-muted-foreground md:text-xl">
+                                Explore our curated collection of trendsetting fashion and accessories.
+                            </p>
+                        </div>
+                        <div class="flex flex-col gap-2 min-[400px]:flex-row">
+                            <button class="bg-blue-500 text-white px-4 py-2 rounded">Shop Now</button>
+                            <button class="border border-blue-500 text-blue-500 px-4 py-2 rounded">Learn More</button>
+                        </div>
+                    </div>
+                    <img src="/placeholder.svg" alt="Hero" class="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last" width="550" height="550">
                 </div>
             </div>
+        </section>
+
+        <!-- Product Section -->
+        <section class="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
+            <div class="container px-4 md:px-6">
+                <h2 class="text-3xl font-bold tracking-tighter sm:text-5xl">Our Products</h2>
+                <div class="grid gap-6 mt-8 sm:grid-cols-2 lg:grid-cols-4">
+                    {% for product in products %}
+                    <a href="{% url 'product_detail' product.id %}" class="group relative overflow-hidden rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="object-cover w-full h-60 transition-transform group-hover:scale-105" width="400" height="300">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 transition-opacity group-hover:opacity-75"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <h3 class="text-white text-2xl font-bold">{{ product.name }}</h3>
+                        </div>
+                        <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-bl-lg">
+                            Rp. {{ product.price }}
+                        </div>
+                    </a>
+                    {% empty %}
+                    <p class="text-center text-gray-600">No products available at the moment.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Section -->
+        <section class="w-full py-12 md:py-24 lg:py-32">
+            <div class="container px-4 md:px-6">
+                <div class="flex flex-col items-center justify-center space-y-4 text-center">
+                    <div class="space-y-2">
+                        <h2 class="text-3xl font-bold tracking-tighter sm:text-5xl">Join Our Newsletter</h2>
+                        <p class="max-w-[900px] text-muted-foreground md:text-xl">
+                            Stay up to date with the latest products, exclusive offers, and fashion tips.
+                        </p>
+                    </div>
+                    <div class="w-full max-w-sm space-y-2">
+                        <form class="flex space-x-2">
+                            <input type="email" class="max-w-lg flex-1 border px-4 py-2 rounded" placeholder="Enter your email" required>
+                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Subscribe</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t">
+        <div class="container flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6">
+            <p class="text-xs text-muted-foreground">© 2024 ModernShop Inc. All rights reserved.</p>
+            <nav class="sm:ml-auto flex gap-4 sm:gap-6">
+                <a href="#" class="text-xs hover:underline underline-offset-4">Terms of Service</a>
+                <a href="#" class="text-xs hover:underline underline-offset-4">Privacy</a>
+            </nav>
         </div>
-    {% endfor %}
-</div>
-<div class="text-center mt-4">
-    <a href="{% url 'store' %}" class="btn btn-lg btn-primary">View All Products</a>
+    </footer>
 </div>
 {% endblock %}

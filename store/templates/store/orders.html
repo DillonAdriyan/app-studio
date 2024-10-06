@@ -1,43 +1,55 @@
-<!-- orders.html -->
 {% extends 'base.html' %}
 
 {% block title %}Your Orders{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Your Orders</h1>
+<h1 class="text-2xl font-bold mb-6 text-center">Your Orders</h1>
+
 {% if orders %}
-    {% for order in orders %}
-        <div class="card mb-4">
-            <div class="card-header">
-                Order #{{ order.id }} - {{ order.created_at }}  <!-- Ganti date dengan created_at -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for order in orders %}
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <div class="flex justify-between items-center mb-4">
+                <div class="text-lg font-semibold">Order #{{ order.id }}</div>
+                <div class="text-sm text-gray-500">{{ order.created_at|date:"F d, Y" }}</div>
             </div>
-            <div class="card-body">
-                <h5 class="card-title">Status: {{ order.status }}</h5>
-                <table class="table">
-                    <thead>
+            <p class="text-sm font-medium mb-2">Status: <span class="text-blue-600">{{ order.status }}</span></p>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="text-left py-2 px-3 text-gray-700">Product</th>
+                            <th class="text-left py-2 px-3 text-gray-700">Quantity</th>
+                            <th class="text-left py-2 px-3 text-gray-700">Price</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        {% for item in order.items.all %}  <!-- Ganti orderitem_set dengan items -->
-                            <tr>
-                                <td>{{ item.product.name }}</td>
-                                <td>{{ item.quantity }}</td>
-                                <td>${{ item.price }}</td>
+                        {% for item in order.items.all %}
+                            <tr class="border-b">
+                                <td class="py-2 px-3">{{ item.product.name }}</td>
+                                <td class="py-2 px-3">{{ item.quantity }}</td>
+                                <td class="py-2 px-3">Rp. {{ item.price }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="2"><strong>Total</strong></td>
-                            <td><strong>${{ order.total_price }}</strong></td>
+                            <td colspan="2" class="text-right font-semibold py-2 px-3">Total:</td>
+                            <td class="py-2 px-3 font-bold">Rp. {{ order.total_price }}</td>
                         </tr>
                     </tfoot>
                 </table>
-                
-                <!-- Tambahkan tombol download invoice -->
-                <a href="{% url 'download_invoice' order.id %}" class="btn btn-primary mt-3">Download Invoice</a>
+            </div>
+
+            <!-- Tombol download invoice -->
+            <div class="mt-4 flex justify-end">
+                <a href="{% url 'download_invoice' order.id %}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Download Invoice</a>
             </div>
         </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
 {% else %}
-    <p>You have no orders yet.</p>
+    <p class="text-center text-gray-500">You have no orders yet.</p>
 {% endif %}
 {% endblock %}

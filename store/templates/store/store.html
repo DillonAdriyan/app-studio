@@ -4,43 +4,142 @@
 {% block title %}Store{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Our Products</h1>
-{% for product in products %}
-<div class="col-md-4 mb-4">
-    <div class="card">
-     {% if product.image %}
-        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
-     {% else %}
-        <span>No image product</span>
-     {% endif %}
-        <div class="card-body">
-            <h5 class="card-title">{{ product.name }}</h5>
-            <p class="card-text">Rp. {{ product.price }}</p>
-            <p>Average Rating: 
+<h1 class="text-2xl font-bold mb-6">Our Products</h1>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {% for product in products %}
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden"><div class="relative">
+    {% if product.image %}
+    <div class="w-full h-48 overflow-hidden relative group">
+        <img src="{{ product.image.url }}"
+            alt="{{ product.name }}"
+            class="w-auto h-52 mx-auto object-cover group-hover:transition-transform group-hover:scale-150 transition duration-1000">
+        
+        {% if product.stock == 0 %}
+        <!-- Display 'Out of Stock' when stock is 0 -->
+        <div class="absolute inset-0 flex items-center justify-center">
+            <span class="p-2 bg-white text-red-600 font-bold rotate-12 shadow-lg">Out of stock</span>
+        </div>
+        {% elif product.stock <= 5 %}
+        <div class="absolute inset-0 top-0 left-0 ">
+            <span class="px-2 py-1 bg-white rounded-br-lg text-red-600
+            shadow-lg text-sm font-semibold">Stock Left {{ product.stock }}</span>
+        </div>
+        {% else %}
+        <!-- Display stock quantity when available -->
+        <div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <span class="text-white text-lg font-semibold">Stock: {{ product.stock }}</span>
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500">
+        No image available
+    </div>
+    {% endif %}
+    
+    <!-- Price tag at top-right corner -->
+    <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-bl-lg">
+        Rp. {{ product.price }}
+    </div>
+</div>
+
+
+        <div class="p-4 bg-white">
+         <div class="grid grid-cols-2 gap-2">
+          
+            <h5 class="text-lg font-semibold text-gray-800 mb-2">{{ product.name }}</h5>
+            <p class="text-sm text-end text-gray-600 mt-1">
                 {% if product.average_rating %}
-                    {{ product.average_rating|floatformat:1 }} / 5
+                    {{
+                    product.average_rating|floatformat:1
+                    }} / 5 ⭐️ ({{
+                    product.rating_count }}
+                    reviewers)
                 {% else %}
                     No ratings yet
                 {% endif %}
             </p>
-            <form method="post" action="{% url 'rate_product' product.id %}">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="rating">Rate this product:</label>
-                    <select name="score" id="rating" class="form-control">
-                        <option value="">Select Rating</option>
-                        {% for i in "12345"|make_list %}
-                            <option value="{{ i }}">{{ i }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit Rating</button>
-            </form>
-            <a href="{% url 'addCart' product.id %}" class="btn btn-primary">Add to Cart</a>
+         </div>
+    <!-- Rating Section -->
+        <form method="post" action="{% url 'rate_product' product.id %}" class="mb-4">
+<div class="grid grid-cols-2 gap-3">
+            {% csrf_token %}
+    <div>
+            <label for="rating" class="block
+            text-sm font-medium text-gray-700 mb-1
+            md:text-xs">Rate this product:</label>
+  <div class="flex items-center space-x-1
+  md:space-x-0">
+    <!-- Loop for star rating -->
+    {% for i in "12345"|make_list %}
+        <input type="radio" id="rating{{ i }}" name="score" value="{{ i }}" class="hidden" />
+        <label for="rating{{ i }}" class="star">
+            <svg class="h-5 w-5 md:h-4 md:w-4 cursor-pointer text-gray-300 transition duration-200 fill-current"
+                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 .587l3.668 7.429L23.064 9.3l-5.496 5.351 1.295 7.544L12 17.958l-6.863 3.6 1.295-7.544L.935 9.299l7.397-1.284L12 .587z" />
+            </svg>
+        </label>
+    {% endfor %}
+</div>
+
+</div>
+    <div>
+            <button type="submit" class="mt-2
+            w-full bg-blue-500 hover:bg-blue-600
+            text-white font-bold py-2 px-4
+            md:text-sm rounded md:max-w-md">Submit
+            Rating</button>
+    </div>
+    </div>
+        </form>
+
+    <!-- Add to Cart Section -->
+        <a href="{% url 'addCart' product.id %}" class="w-full block text-center bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+            Add to Cart
+        </a>
+
         </div>
     </div>
+    {% empty %}
+    <p class="text-center text-gray-600">No products available at the moment.</p>
+    {% endfor %}
 </div>
-{% empty %}
-<p>No product is here</p>
-{% endfor %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const stars = document.querySelectorAll('.star');
+        
+        stars.forEach((star, index) => {
+            star.addEventListener('click', () => {
+                clearStars();
+                highlightStars(index + 1);
+                document.querySelector(`#rating${index + 1}`).checked = true;
+            });
+
+            star.addEventListener('mouseover', () => {
+                clearStars();
+                highlightStars(index + 1);
+            });
+
+            star.addEventListener('mouseout', () => {
+                const selectedRating = document.querySelector('input[name="score"]:checked');
+                clearStars();
+                if (selectedRating) {
+                    highlightStars(selectedRating.value);
+                }
+            });
+        });
+
+        function highlightStars(rating) {
+            for (let i = 0; i < rating; i++) {
+                stars[i].querySelector('svg').classList.add('text-yellow-500');
+            }
+        }
+
+        function clearStars() {
+            stars.forEach(star => {
+                star.querySelector('svg').classList.remove('text-yellow-500');
+            });
+        }
+    });
+</script>
 {% endblock %}
