@@ -412,7 +412,10 @@ def rate_product(request, product_id):
     return redirect('store')
     
     
-def product_detail(product_id):
- product = get_object_or_404(Product,
- id=product_id)
+def product_detail(request, product_id):
+ product = get_object_or_404(Product, id=product_id)
  
+ return render(request,
+ 'store/detail/product.html', context = {
+  'product':product
+ })

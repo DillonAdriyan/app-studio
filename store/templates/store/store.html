@@ -42,7 +42,7 @@
         Rp. {{ product.price }}
     </div>
 </div>
-
+<div class="text-yellow-500"></div>
 
         <div class="p-4 bg-white">
          <div class="grid grid-cols-2 gap-2">
@@ -50,11 +50,7 @@
             <h5 class="text-lg font-semibold text-gray-800 mb-2">{{ product.name }}</h5>
             <p class="text-sm text-end text-gray-600 mt-1">
                 {% if product.average_rating %}
-                    {{
-                    product.average_rating|floatformat:1
-                    }} / 5 ⭐️ ({{
-                    product.rating_count }}
-                    reviewers)
+                {{ product.average_rating|floatformat:1 }} / 5 ⭐️ ({{ product.rating_count }} reviewers)
                 {% else %}
                     No ratings yet
                 {% endif %}
@@ -74,7 +70,9 @@
     {% for i in "12345"|make_list %}
         <input type="radio" id="rating{{ i }}" name="score" value="{{ i }}" class="hidden" />
         <label for="rating{{ i }}" class="star">
-            <svg class="h-5 w-5 md:h-4 md:w-4 cursor-pointer text-gray-300 transition duration-200 fill-current"
+            <svg class="h-5 w-5 md:h-4 md:w-4
+            cursor-pointer transition
+            duration-200 fill-current"
                  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M12 .587l3.668 7.429L23.064 9.3l-5.496 5.351 1.295 7.544L12 17.958l-6.863 3.6 1.295-7.544L.935 9.299l7.397-1.284L12 .587z" />
             </svg>
