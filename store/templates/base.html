@@ -8,6 +8,9 @@
     <title>{% block title %}My Store{% endblock %}</title>
     {% block extra_css %}{% endblock %}
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    <link href="{% static 'css/package/swiper-bundle.min.css' %}"
+    rel="stylesheet"/>
+    <script src="{% static 'css/package/swiper-bundle.min.js' %}"></script>
 </head>
 <body class="bg-base-primary">
     <nav class="bg-white shadow-md">
@@ -15,21 +18,31 @@
             <a href="{% url 'homepage' %}" class="text-xl font-bold text-gray-800 hover:text-gray-600">
                 My Store
             </a>
+            <!-- Mobile Menu Button -->
             <button class="block lg:hidden text-gray-800" id="menuToggle">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
                 </svg>
             </button>
-            <div class="hidden lg:flex space-x-6 items-center" id="navbarMenu">
-                <a href="{% url 'store' %}" class="text-gray-800 hover:text-gray-600">Store</a>
+            
+            <!-- Navbar Menu -->
+            <div class="absolute top-0 left-0 w-64
+            min-h-screen bg-base-primary shadow-lg transform
+            -translate-x-full transition-transform
+            lg:translate-x-0 lg:relative lg:flex
+            lg:space-x-6 lg:items-center lg:w-auto
+            lg:bg-transparent lg:h-auto
+            lg:shadow-none lg:sticky lg:top-0 z-50"
+            id="navbarMenu">
+                <a href="{% url 'store' %}" class="block px-4 py-2 text-gray-800 hover:text-gray-600 lg:inline-block">Store</a>
                 <div class="space-x-6">
                     {% if user.is_authenticated %}
-                        <a href="{% url 'cart' %}" class="text-gray-800 hover:text-gray-600">Cart</a>
-                        <a href="{% url 'orders' %}" class="text-gray-800 hover:text-gray-600">Orders</a>
-                        <a href="{% url 'logout' %}" class="text-red-600 hover:text-red-400">Logout</a>
+                        <a href="{% url 'cart' %}" class="block px-4 py-2 text-gray-800 hover:text-gray-600 lg:inline-block">Cart</a>
+                        <a href="{% url 'orders' %}" class="block px-4 py-2 text-gray-800 hover:text-gray-600 lg:inline-block">Orders</a>
+                        <a href="{% url 'logout' %}" class="block px-4 py-2 text-red-600 hover:text-red-400 lg:inline-block">Logout</a>
                     {% else %}
-                        <a href="{% url 'login' %}" class="text-gray-800 hover:text-gray-600">Login</a>
-                        <a href="{% url 'signup' %}" class="text-gray-800 hover:text-gray-600">Sign Up</a>
+                        <a href="{% url 'login' %}" class="block px-4 py-2 text-gray-800 hover:text-gray-600 lg:inline-block">Login</a>
+                        <a href="{% url 'signup' %}" class="block px-4 py-2 text-gray-800 hover:text-gray-600 lg:inline-block">Sign Up</a>
                     {% endif %}
                 </div>
             </div>
@@ -66,9 +79,97 @@
         const navbarMenu = document.getElementById('navbarMenu');
         
         menuToggle.addEventListener('click', () => {
-            navbarMenu.classList.toggle('hidden');
+            // Toggle translate class for showing and hiding menu
+            if (navbarMenu.classList.contains('-translate-x-full')) {
+                navbarMenu.classList.remove('-translate-x-full');
+                navbarMenu.classList.add('translate-x-0');
+            } else {
+                navbarMenu.classList.add('-translate-x-full');
+                navbarMenu.classList.remove('translate-x-0');
+            }
         });
     </script>
+        <script>
+      var swiper = new Swiper(".centered-slide-carousel", {
+       centeredSlides: true,
+       paginationClickable: true,
+       loop: true,
+       spaceBetween: 30,
+       slideToClickedSlide: true,
+       autoplay: {
+        delay: 1200,
+        disableOnInteraction: false,
+      },
+       pagination: {
+         el: ".centered-slide-carousel .swiper-pagination",
+         clickable: true,
+       },
+       breakpoints: {
+         1920: {
+           slidesPerView: 4,
+           spaceBetween: 30
+         },
+         1028: {
+           slidesPerView: 2,
+           spaceBetween: 10
+         },
+         990: {
+           slidesPerView: 1,
+           spaceBetween: 0
+         }
+       }
+      });
+      </script>
+              <script>
+            // Function to handle category click
+            document.querySelectorAll('.tab-link').forEach(tab => {
+                tab.addEventListener('click', function(event) {
+                    event.preventDefault();
+
+                    // Remove active class from all tabs
+                    document.querySelectorAll('.tab-link').forEach(link => {
+                        link.classList.remove('text-primary', 'border-b-2', 'border-primary');
+                        link.dataset.selected = 'false';
+                    });
+
+                    // Add active class to clicked tab
+                    this.classList.add('text-primary', 'border-b-2', 'border-primary');
+                    this.dataset.selected = 'true';
+
+                    // Get selected category
+                    const categoryId = this.dataset.category;
+
+                    // Send AJAX request to fetch products
+                    fetch(`/?category=${categoryId}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Update products in the container
+                        const productContainer = document.getElementById('product-container');
+                        productContainer.innerHTML = '';
+
+                        data.products.forEach(product => {
+                            const productHTML = `
+                                <a href="/product_detail/${product.id}" class="group relative overflow-hidden rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                                    <img src="${product.image}" alt="${product.name}" class="object-cover w-full h-60 transition-transform group-hover:scale-105" width="400" height="300">
+                                    <div class="absolute inset-0 bg-black bg-opacity-40 transition-opacity group-hover:opacity-75"></div>
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <h3 class="text-white text-2xl font-bold">${product.name}</h3>
+                                    </div>
+                                    <div class="absolute top-0 right-0 bg-white text-primary text-xs font-semibold px-2 py-1 rounded-bl-lg">
+                                        Rp. ${product.price}
+                                    </div>
+                                </a>
+                            `;
+                            productContainer.insertAdjacentHTML('beforeend', productHTML);
+                        });
+                    });
+                });
+            });
+        </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

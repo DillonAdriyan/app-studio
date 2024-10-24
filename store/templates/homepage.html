@@ -35,38 +35,61 @@
                             More</button>
                         </div>
                     </div>
+                    </div>
 <!--<img src="/placeholder.svg" alt="Hero" class="mx-auto w-full aspect-video overflow-hidden rounded-xl object-cover object-center lg:order-last" width="550" height="550">-->
-
-                </div>
+ <!--HTML CODE-->
+      <div class="w-full relative mt-8">
+      <div class="swiper centered-slide-carousel swiper-container relative ">
+      <div class="swiper-wrapper">
+       {% for product in products %}
+       <div class="swiper-slide">
+         <div class="bg-base-secondary rounded-2xl h-64 flex justify-center items-center">
+<img
+src="{{ product.image.url }}" alt="{{ product.name}}">
+         </div>
+       </div>
+       {% endfor %}
+      </div>
+      <div class="swiper-pagination "></div>
+      </div>
+      </div>
             </div>
         </section>
 
         <!-- Product Section -->
-        <section class="w-full py-12 md:py-24
-        lg:py-32 bg-base-primary dark:bg-primary">
-            <div class="container px-4 md:px-6">
-                <h2 class="text-3xl
-                text-base-primary font-bold
-                tracking-tighter sm:text-5xl">Our
-                Products</h2>
-                <div class="grid gap-6 mt-8 sm:grid-cols-2 lg:grid-cols-4">
-                    {% for product in products %}
-                    <a href="{% url 'product_detail' product.id %}" class="group relative overflow-hidden rounded-lg shadow-lg transition-transform transform hover:scale-105">
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="object-cover w-full h-60 transition-transform group-hover:scale-105" width="400" height="300">
-                        <div class="absolute inset-0 bg-black bg-opacity-40 transition-opacity group-hover:opacity-75"></div>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <h3 class="text-white text-2xl font-bold">{{ product.name }}</h3>
-                        </div>
-                        <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-bl-lg">
-                            Rp. {{ product.price }}
-                        </div>
-                    </a>
-                    {% empty %}
-                    <p class="text-center text-gray-600">No products available at the moment.</p>
-                    {% endfor %}
+        
+<section class="w-full py-12 md:py-24 lg:py-32 bg-base-secondary dark:bg-primary">
+    <div class="container px-4 md:px-6">
+        <h2 class="text-3xl text-primary dark:text-base-primary font-bold tracking-tighter sm:text-5xl">Our Products</h2>
+
+        <!-- Tabs untuk kategori -->
+        <div class="mt-6 flex space-x-4 border-b border-gray-300">
+            <a href="#" data-category="" class="pb-2 px-4 font-semibold text-lg tab-link" data-selected="false">All</a>
+            {% for category in categories %}
+            <a href="#" data-category="{{ category.id }}" class="pb-2 px-4 font-semibold text-lg tab-link" data-selected="false">{{ category.name }}</a>
+            {% endfor %}
+        </div>
+
+        <!-- Produk akan di-update di sini -->
+        <div id="product-container" class="grid gap-6 mt-8 sm:grid-cols-2 lg:grid-cols-4">
+            {% for product in page_obj %}
+            <a href="{% url 'product_detail' product.id %}" class="group relative overflow-hidden rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="object-cover w-full h-60 transition-transform group-hover:scale-105" width="400" height="300">
+                <div class="absolute inset-0 bg-black bg-opacity-40 transition-opacity group-hover:opacity-75"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <h3 class="text-white text-2xl font-bold">{{ product.name }}</h3>
                 </div>
-            </div>
-        </section>
+                <div class="absolute top-0 right-0 bg-white text-primary text-xs font-semibold px-2 py-1 rounded-bl-lg">
+                    Rp. {{ product.price }}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+
+
 
         <!-- Newsletter Section -->
         <section class="w-full py-12 md:py-24 lg:py-32">

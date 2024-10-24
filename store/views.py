@@ -9,10 +9,11 @@ from .models import Product, Category, Order, OrderItem, Cart, CartItem, Wishlis
 from django.db.models import Avg
 from django.db.models import F
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from weasyprint import HTML
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import os
 from django.conf import settings
 from django.http import FileResponse
@@ -68,17 +69,46 @@ class InstagramDataView(APIView):
         else:
             return Response({'error': 'Failed to retrieve data'}, status=400)
             
+
+
+
 def homepage(request):
     products = Product.objects.filter(is_active=True).annotate(
-        average_rating=Avg('ratings__score')  # Calculate average rating
+        average_rating=Avg('ratings__score')
     )
     categories = Category.objects.all()
+
     category_id = request.GET.get('category')
     if category_id:
         products = products.filter(category_id=category_id)
-    return render(request, 'homepage.html', {'products': products,
-      'categories': categories,
+
+    paginator = Paginator(products, 8)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Cek apakah ini request AJAX untuk kategori
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        # Mengembalikan data produk sebagai JSON
+        products_list = [
+            {
+                'id': product.id,
+                'name': product.name,
+                'image': product.image.url,
+                'price': product.price
+            }
+            for product in page_obj
+        ]
+        return JsonResponse({'products': products_list})
+
+    return render(request, 'homepage.html', {
+        'products': products,
+        'page_obj': page_obj,
+        'categories': categories,
+        'selected_category': category_id
     })
+
+
+
 
 
 

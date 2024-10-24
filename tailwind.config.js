@@ -2,6 +2,7 @@
 module.exports = {
   content: [
     './templates/**/*.html',
+    './**/templates/*.html',
     './**/templates/**/*.html',
     './store/templates/**/*.html',
     './static/js/**/*.js',
@@ -10,14 +11,16 @@ module.exports = {
    container: {
     center: true
    },
-   colors: {
-    'primary': '#1c1917',
-    'base-primary': '#f5f5f4',
-   },
     extend: {
+     colors: {
+     'primary': '#1c1917',
+     'base-primary': '#f5f5f4',
+     'base-secondary': '#e2e2e2',
+   },
     },
   },
-  plugins: [],
+  plugins: [
+   ],
 }
 
 
