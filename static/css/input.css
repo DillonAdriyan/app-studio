@@ -1,6 +1,44 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../font/Poppins-Regular.woff2')
+  format('woff2');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../font/Poppins-Bold.woff2')
+  format('woff2');
+}
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src:
+  url('../font/roboto-v32-latin-regular.woff2')
+  format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../font/roboto-v32-latin-700.woff2')
+  format('woff2');
+}
+body {
+  font-family: 'Roboto', sans-serif; /* Default font for paragraphs */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', sans-serif; /* Font for all headers */
+}
 
       .swiper-wrapper {
       width: 100%;

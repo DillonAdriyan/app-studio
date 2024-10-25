@@ -128,12 +128,20 @@
 
                     // Remove active class from all tabs
                     document.querySelectorAll('.tab-link').forEach(link => {
-                        link.classList.remove('text-primary', 'border-b-2', 'border-primary');
+                        link.classList.remove('text-primary',
+                        'border-b-2',
+                        'border-primary',
+                        'dark:text-base-primary',
+                        'dark:border-base-primary');
                         link.dataset.selected = 'false';
                     });
 
                     // Add active class to clicked tab
-                    this.classList.add('text-primary', 'border-b-2', 'border-primary');
+                    this.classList.add('text-primary',
+                    'border-b-2',
+                    'border-primary',
+                    'dark:text-base-primary',
+                    'dark:border-base-primary');
                     this.dataset.selected = 'true';
 
                     // Get selected category

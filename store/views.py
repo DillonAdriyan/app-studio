@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
-from .models import Product, Category, Order, OrderItem, Cart, CartItem, Wishlist, Rating
+from .models import Product, Category, Order,OrderItem, Cart, CartItem, Wishlist, Rating, Promo
 from django.db.models import Avg
 from django.db.models import F
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -31,6 +31,8 @@ from rest_framework import status
 import requests
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
+from django.utils import timezone
+import datetime
 
 class FacebookProfileView(APIView):
     def get(self, request, *args, **kwargs):
@@ -110,8 +112,6 @@ def homepage(request):
 
 
 
-
-
 def store(request):
     products = Product.objects.filter(is_active=True).annotate(
         average_rating=Avg('ratings__score')  # Calculate average rating
@@ -120,11 +120,16 @@ def store(request):
     category_id = request.GET.get('category')
     if category_id:
         products = products.filter(category_id=category_id)
-    
+
+    # Ambil promo yang aktif
+    active_promos = Promo.objects.filter(start_date__lte=timezone.now(), end_date__gte=timezone.now())
+
     return render(request, 'store/store.html', {
         'products': products,
         'categories': categories,
+        'active_promos': active_promos,  # Kirim promo ke template
     })
+
 
 
 def signup(request):

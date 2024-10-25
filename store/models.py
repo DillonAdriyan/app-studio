@@ -200,3 +200,25 @@ class Rating(models.Model):
     def __str__(self):
         return f"{self.user.username} rated {self.product.name} with {self.score}"
         
+
+class Promo(models.Model):
+ 
+    COLOR_CHOICES = [
+     ('green-300', 'green'),
+     ('red-300', 'red'),
+     ('blue-300', 'blue'),
+     ('neutral-300', 'neutral')
+     ]
+    title = models.CharField(max_length=150)
+    banner = models.ImageField(upload_to="promo/", blank=True)
+    start_date = models.DateTimeField(default=timezone.now)
+    end_date = models.DateTimeField(default=timezone.now)
+    color = models.CharField(max_length=20, choices=COLOR_CHOICES, default='neutral')
+    description = models.TextField(blank=True)
+    products = models.ManyToManyField(Product, related_name='promos', blank=True)
+
+    def __str__(self):
+        return self.title
+
+    def is_active(self):
+        return self.start_date <= timezone.now() <= self.end_date

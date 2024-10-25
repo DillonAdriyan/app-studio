@@ -12,6 +12,10 @@ module.exports = {
     center: true
    },
     extend: {
+     fontFamily: {
+      poppins: ['Poppins', 'sans-serif'],
+      roboto: ['Roboto', 'sans-serif'],
+      },
      colors: {
      'primary': '#1c1917',
      'base-primary': '#f5f5f4',
