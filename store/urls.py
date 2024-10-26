@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import login, logout, homepage, signup, CheckOut, OrderView, store, add_to_cart, cart, add_quantity, remove_quantity, wishlist, add_to_wishlist,product_detail, rate_product, download_invoice
+from .views import login, logout, homepage, signup, CheckOut, OrderView, store, add_to_cart, cart, add_quantity, remove_quantity, wishlist, add_to_wishlist,product_detail, rate_product, download_invoice, promo_detail
 from django.conf.urls.static import static
 from django.conf import settings
 from .views import InstagramDataView
@@ -24,6 +24,7 @@ urlpatterns = [
     
     # url api
     path('api/instagram-data/', InstagramDataView.as_view(), name='instagram-data'),
+    path('promo/<int:promo_id>/', promo_detail, name='promo_detail'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

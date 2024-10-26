@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="promo-detail-section p-6 bg-gray-100 rounded-lg shadow-lg">
+    <h1 class="text-2xl font-bold">{{ promo.title }}</h1>
+    <img src="{{ promo.banner.url }}" alt="{{ promo.title }}" class="w-full h-64 object-cover rounded mb-4">
+    <p>{{ promo.description }}</p>
+    <p>Valid from {{ promo.start_date|date:"D, d M Y" }} to {{ promo.end_date|date:"D, d M Y" }}</p>
+
+    <h2 class="mt-6 text-xl font-semibold">Products in this Promotion:</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+        {% for product in promo_products %}
+            <div class="product-card bg-white rounded-lg shadow-lg p-4">
+                <h3 class="font-bold text-lg">{{ product.name }}</h3>
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-32 object-cover rounded mb-2">
+                <p>Price: {{ product.price }}</p>
+                <a href="{% url 'product_detail' product.id %}" class="text-blue-500">View Details</a>
+            </div>
+        {% empty %}
+            <p>No products in this promotion.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

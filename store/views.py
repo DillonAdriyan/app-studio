@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_POST
 from django.views import View
 from .models import Product, Category, Order,OrderItem, Cart, CartItem, Wishlist, Rating, Promo
 from django.db.models import Avg
@@ -130,7 +131,15 @@ def store(request):
         'active_promos': active_promos,  # Kirim promo ke template
     })
 
+def promo_detail(request, promo_id):
+    promo = get_object_or_404(Promo, id=promo_id)
+    promo_products = promo.products.filter(is_active=True)  # Ambil hanya produk aktif yang terkait dengan promo
 
+    return render(request, 'store/detail/promo_detail.html', {
+        'promo': promo,
+        'promo_products': promo_products,
+    })
+    
 
 def signup(request):
     if request.method == 'POST':
@@ -348,25 +357,31 @@ class OrderView(View):
 
 
 @login_required
+@require_POST
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     if product.stock < 1:
         messages.error(request, f"{product.name} is out of stock.")
-        return redirect('store')
+    else:
+        cart, created = Cart.objects.get_or_create(customer=request.user)
+        cart_item, created = cart.items.get_or_create(product=product)
 
-    cart, created = Cart.objects.get_or_create(customer=request.user)
-    cart_item, created = cart.items.get_or_create(product=product)
-    
-    if not created:
-        if cart_item.quantity < product.stock:
+        if not created and cart_item.quantity < product.stock:
             cart_item.quantity = F('quantity') + 1
-        else:
+            cart_item.save()
+            messages.success(request, f"{product.name} has been added to your cart.")
+        elif not created:
             messages.error(request, f"Cannot add more {product.name}. Only {product.stock} left in stock.")
-            return redirect('cart')
 
-    cart_item.save()
-    messages.success(request, f"{product.name} has been added to your cart.")
-    return redirect('store')
+    # Collect messages to send as JSON
+    message_data = [
+        {"text": message.message, "tags": message.tags}
+        for message in messages.get_messages(request)
+    ]
+    return JsonResponse({"messages": message_data})
+
+
+
 
 
 
@@ -446,11 +461,12 @@ def rate_product(request, product_id):
             return redirect('store')  # Redirect to the store after submitting the rating
     return redirect('store')
     
-    
+
 def product_detail(request, product_id):
- product = get_object_or_404(Product, id=product_id)
- 
- return render(request,
- 'store/detail/product.html', context = {
-  'product':product
- })
+    product = get_object_or_404(Product, id=product_id, is_active=True)
+    recently_viewed_products = Product.objects.filter(is_active=True).exclude(id=product.id)[:3]  # Produk yang baru saja dilihat (dummy)
+
+    return render(request, 'store/product_detail.html', {
+        'product': product,
+        'recently_viewed_products': recently_viewed_products,
+    })

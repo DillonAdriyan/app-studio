@@ -37,15 +37,14 @@
          {{ promo.title }}
          </h2>
          <p class="text-sm">{{ promo.description }}</p>
-         <a href="{% url 'promo_detail' promo.id
-         %}" class="absolute bottom-0 ml-2 mb-4
+         <a href="{% url 'promo_detail' promo.id %}" class="absolute bottom-0 ml-2 mb-4
          font-semibold text-xs">Lihat promo
          -></a>
          </div>
          <div class="absolute w-1/2 right-0 mr-2
          mt-2">
 <img
-class="h-40 w-auto object-cover" src="{{ promo.banner.url }}" alt="{{ promo.title}}">
+class="h-40 w-auto object-cover mt-4" src="{{ promo.banner.url }}" alt="{{ promo.title}}">
          </div>
          </div>
        </div>
@@ -90,7 +89,12 @@ class="h-40 w-auto object-cover" src="{{ promo.banner.url }}" alt="{{ promo.titl
     <div class="flex items-center justify-between mt-auto">
       <span class="text-xl font-bold
       text-blue-600">Rp. {{ product.price }}</span>
-      <button class="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600">
+      <button onclick="addToCart({{ product.id }})" class="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600">
+    <!-- SVG icon here -->
+
+
+        
+
 
 <svg class="fill-current ml-1" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
 
@@ -112,6 +116,7 @@ class="h-40 w-auto object-cover" src="{{ promo.banner.url }}" alt="{{ promo.titl
 </g>
 </svg>
       </button>
+       
     </div>
   </div>
 </div>

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block content %}
+<header class="bg-white shadow-md">
+    <div class="container mx-auto flex items-center justify-between py-4 px-6">
+        <div class="flex items-center space-x-4">
+            <i class="fas fa-bars text-xl"></i>
+            <nav class="space-x-6">
+                <a class="text-gray-700 hover:text-black" href="#">Sofas</a>
+                <a class="text-gray-700 hover:text-black" href="#">Chairs</a>
+                <a class="text-gray-700 hover:text-black" href="#">Beds</a>
+            </nav>
+        </div>
+        <div class="text-center">
+            <h1 class="text-2xl font-bold">Furniture</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <i class="fas fa-search text-xl"></i>
+            <i class="fas fa-heart text-xl"></i>
+            <i class="fas fa-shopping-cart text-xl"></i>
+        </div>
+    </div>
+</header>
+<main class="container mx-auto py-8 px-6">
+    <div class="flex flex-col lg:flex-row space-y-8 lg:space-y-0 lg:space-x-8">
+        <div class="w-full lg:w-1/2">
+            <div class="bg-white p-4 shadow-md">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-auto">
+                <div class="flex space-x-2 mt-4">
+                    {% for thumbnail in product.thumbnails.all %}
+                        <img src="{{ thumbnail.image.url }}" alt="Thumbnail" class="w-16 h-16 border">
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="mt-8">
+                <h2 class="text-lg font-semibold mb-4">Recently viewed</h2>
+                <div class="flex space-x-4">
+                    {% for recent_product in recently_viewed_products %}
+                        <div class="w-1/4">
+                            <img src="{{ recent_product.image.url }}" alt="{{ recent_product.name }}" class="w-full h-auto">
+                            <p class="text-center mt-2">${{ recent_product.price }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="w-full lg:w-1/2">
+            <div class="bg-white p-6 shadow-md">
+                <h2 class="text-3xl font-bold mb-4">{{ product.name }}</h2>
+                <p class="text-gray-700 mb-4">{{ product.description }}</p>
+                <p class="text-2xl font-semibold mb-4">${{ product.price }}</p>
+                <div class="flex items-center mb-4">
+                    <div class="flex items-center space-x-1 text-yellow-500">
+                        {% for i in range|slice:":5" %}
+                            <i class="fas fa-star{% if product.average_rating < i + 1 %}-half-alt{% endif %}"></i>
+                        {% endfor %}
+                    </div>
+                    <a class="text-blue-500 ml-2" href="#">{{ product.reviews.count }} reviews</a>
+                </div>
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold mb-2">Colour</h3>
+                    <div class="flex space-x-2">
+                        {% for color in product.colors %}
+                            <div class="w-8 h-8 rounded-full" style="background-color: {{ color.hex_code }};"></div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="flex space-x-4 mb-4">
+                    <button class="bg-black text-white px-6 py-2">Buy Now</button>
+                    <button class="border border-black px-6 py-2">Add to basket</button>
+                </div>
+                <div class="mb-4">
+                    <p class="text-gray-700">Dispatched in 5 – 7 weeks <a class="text-blue-500" href="#">Why the longer lead time?</a></p>
+                </div>
+                <div>
+                    <p class="text-gray-700">Home Delivery: $ 10</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
