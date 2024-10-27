@@ -27,11 +27,12 @@
             
             <!-- Navbar Menu -->
             <div class="absolute top-0 left-0 w-64
-            min-h-screen bg-base-primary shadow-lg transform
+            h-full lg:max-h-12 bg-base-primary shadow-lg
+            transform
             -translate-x-full transition-transform
             lg:translate-x-0 lg:relative lg:flex
             lg:space-x-6 lg:items-center lg:w-auto
-            lg:bg-transparent lg:h-auto
+            lg:bg-transparent
             lg:shadow-none lg:sticky lg:top-0 z-50"
             id="navbarMenu">
                 <a href="{% url 'store' %}" class="block px-4 py-2 text-gray-800 hover:text-gray-600 lg:inline-block">Store</a>
@@ -48,14 +49,16 @@
             </div>
         </div>
     </nav>
-
-    <div class="container flex flex-col min-h-screen">
 <div id="message-container" class="container mx-auto px-4 py-2 fixed top-0 transition duration-300"></div>
+<div id="message-container" class="fixed top-0 left-0 w-full p-4"></div>
+
+
+
+
 
 
         {% block content %}
         {% endblock %}
-    </div>
 
     <footer class="border-t">
         <div class="container flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6">
@@ -68,26 +71,43 @@
     </footer>
 <!-- Add this inside your HTML <head> or at the end of the body -->
 <script>
+let isProcessing = false;
+
+function changeQuantity(amount) {
+    const quantityInput = document.getElementById('quantity-input');
+    let currentQuantity = parseInt(quantityInput.value) || 0;
+    currentQuantity += amount;
+
+    if (currentQuantity < 1) currentQuantity = 1; // Prevent negative quantity
+    quantityInput.value = currentQuantity;
+}
+
 function addToCart(productId) {
+    if (isProcessing) return;
+
+    const quantityInput = document.getElementById('quantity-input');
+    const quantity = parseInt(quantityInput.value) || 1; // Default to 1 if input is invalid
+
+    isProcessing = true;
+    
     fetch(`/orders/${productId}/`, {
         method: "POST",
         headers: {
             "X-CSRFToken": "{{ csrf_token }}",
             "Content-Type": "application/json",
-        }
+        },
+        body: JSON.stringify({ quantity: quantity })
     })
     .then(response => response.json())
     .then(data => {
-        // Clear existing messages
         const messageContainer = document.getElementById('message-container');
         messageContainer.innerHTML = '';
 
-        // Display new messages
         if (data.messages) {
             data.messages.forEach(message => {
                 const div = document.createElement('div');
                 div.className = `
-                    p-4 mb-4 text-white rounded-lg shadow-md opacity-0 transform transition duration-500 ease-out
+                    p-4 mb-4 text-white rounded-lg shadow-md transition-opacity duration-500
                     ${message.tags === 'success' ? 'bg-green-500' : ''}
                     ${message.tags === 'error' ? 'bg-red-500' : ''}
                     ${message.tags === 'warning' ? 'bg-yellow-500' : ''}
@@ -96,23 +116,24 @@ function addToCart(productId) {
                 div.textContent = message.text;
                 messageContainer.appendChild(div);
 
-                // Trigger appearance animation
                 setTimeout(() => {
-                    div.classList.add('opacity-100', 'translate-y-0');
-                }, 10);
-
-                // Auto-hide the message after 3 seconds with fade-out effect
-                setTimeout(() => {
-                    div.classList.remove('opacity-100');
                     div.classList.add('opacity-0');
-                    setTimeout(() => div.remove(), 500);  // Remove the element after fade-out
+                    setTimeout(() => div.remove(), 500);
                 }, 3000);
             });
         }
+
+        setTimeout(() => {
+            isProcessing = false;
+        }, 500); // Small delay to avoid immediate re-clicking
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error:', error);
+        isProcessing = false;
+    });
 }
 </script>
+
 
 
 

@@ -9,8 +9,8 @@
     <main class="flex-1">
         <!-- Hero Section -->
         <section class="w-full py-12 md:py-24 lg:py-32 xl:py-48">
-            <div class="container px-4 md:px-6">
-                <div class="grid gap-6">
+            <div class="container flex flex-wrap px-4 md:px-6">
+                <div class="grid gap-6 lg:w-1/2">
                     <div class="flex flex-col justify-center space-y-4">
                         <div class="space-y-2">
                             <h1 class="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl">
@@ -38,14 +38,16 @@
                     </div>
 <!--<img src="/placeholder.svg" alt="Hero" class="mx-auto w-full aspect-video overflow-hidden rounded-xl object-cover object-center lg:order-last" width="550" height="550">-->
  <!--HTML CODE-->
-      <div class="w-full relative mt-8">
+      <div class="w-full lg:w-1/2 relative mt-8">
       <div class="swiper centered-slide-carousel swiper-container relative ">
       <div class="swiper-wrapper">
        {% for product in products %}
        <div class="swiper-slide">
          <div class="bg-base-secondary rounded-2xl h-64 flex justify-center items-center">
 <img
-src="{{ product.image.url }}" alt="{{ product.name}}">
+src="{{ product.image.url }}" alt="{{
+product.name}}" height="200" class="object-cover
+w-full h-auto">
          </div>
        </div>
        {% endfor %}
@@ -63,7 +65,8 @@ src="{{ product.image.url }}" alt="{{ product.name}}">
         <h2 class="text-3xl text-primary dark:text-base-primary font-bold tracking-tighter sm:text-5xl">Our Products</h2>
 
         <!-- Tabs untuk kategori -->
-        <div class="mt-6 flex space-x-4 border-b border-gray-300">
+        <div class="mt-6 flex space-x-4 border-b
+        border-gray-300 overflow-x-scroll">
             <a href="#" data-category="" class="pb-2 px-4 font-semibold text-lg tab-link" data-selected="false">All</a>
             {% for category in categories %}
             <a href="#" data-category="{{ category.id }}" class="pb-2 px-4 font-semibold text-lg tab-link" data-selected="false">{{ category.name }}</a>

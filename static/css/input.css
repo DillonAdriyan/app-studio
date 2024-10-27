@@ -39,6 +39,12 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Poppins', sans-serif; /* Font for all headers */
 }
+#quantity-input {
+    width: 50px; /* or any desired width */
+}
+#decrement, #increment {
+    width: 30px; /* Fixed width for plus/minus buttons */
+}
 
       .swiper-wrapper {
       width: 100%;

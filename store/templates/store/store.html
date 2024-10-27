@@ -89,7 +89,15 @@ class="h-40 w-auto object-cover mt-4" src="{{ promo.banner.url }}" alt="{{ promo
     <div class="flex items-center justify-between mt-auto">
       <span class="text-xl font-bold
       text-blue-600">Rp. {{ product.price }}</span>
-      <button onclick="addToCart({{ product.id }})" class="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600">
+<div class="flex items-center">
+    <button id="decrement" class="bg-gray-300 text-black p-1 rounded-l" onclick="changeQuantity(-1)">-</button>
+    <input type="number" id="quantity-input" value="1" min="1" class="w-16 text-center border rounded" />
+    <button id="increment" class="bg-gray-300 text-black p-1 rounded-r" onclick="changeQuantity(1)">+</button>
+
+    <button onclick="addToCart({{ product.id }})" class="bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 ml-2">
+        <!-- Cart icon SVG here -->
+
+    <!-- Cart icon SVG here -->
     <!-- SVG icon here -->
 
 
@@ -117,6 +125,7 @@ class="h-40 w-auto object-cover mt-4" src="{{ promo.banner.url }}" alt="{{ promo
 </svg>
       </button>
        
+    </div>
     </div>
   </div>
 </div>
