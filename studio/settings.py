@@ -42,7 +42,7 @@ SECRET_KEY = 'django-insecure-od0o9vo-x-5h=bdycr8=umh4gh$unu#l$%niu*uvlj8+z+_^32
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['dillonadriyan.pythonanywhere.com' '.ngrok-free.app', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['dillonadriyan.pythonanywhere.com' '.ngrok-free.app', 'localhost', '127.0.0.1', '172.25.93.40']
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': 

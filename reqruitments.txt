@@ -11,3 +11,4 @@ pillow
 reportlab
 weasyprint
 python-decouple
+dj_rest-auth

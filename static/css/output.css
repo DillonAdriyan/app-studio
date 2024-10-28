@@ -977,10 +977,6 @@ video {
   height: 100%;
 }
 
-.min-h-screen {
-  min-height: 100vh;
-}
-
 .w-1\/2 {
   width: 50%;
 }
@@ -2486,10 +2482,6 @@ h1, h2, h3, h4, h5, h6 {
 
   .lg\:h-72 {
     height: 18rem;
-  }
-
-  .lg\:h-auto {
-    height: auto;
   }
 
   .lg\:max-h-12 {
